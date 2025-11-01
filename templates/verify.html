@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card">
+  <h2>Vérification du certificat</h2>
+  {% if not found %}
+    <p>Code introuvable ou expiré.</p>
+  {% else %}
+    <p><strong>Nom:</strong> {{ data.name }}</p>
+    <p><strong>Score:</strong> {{ data.summary.total_score }} / {{ data.summary.total_questions }}</p>
+    <p><strong>Niveau CECRL:</strong> {{ data.summary.level }}</p>
+    <p><strong>Émis le:</strong> {{ data.issued_at }}</p>
+  {% endif %}
+</section>
+{% endblock %}

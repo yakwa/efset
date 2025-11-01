@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="page-hero">
+  <div class="page-hero-content">
+    <h1>Contact Us</h1>
+    <p>We'd love to hear from you</p>
+  </div>
+</section>
+
+<section class="contact-content">
+  <div class="content-container">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h2>Get in Touch</h2>
+        <p>Have questions about our tests or courses? Need technical support? We're here to help!</p>
+        
+        <div class="contact-methods">
+          <div class="contact-method">
+            <div class="contact-icon">📧</div>
+            <h3>Email</h3>
+            <p>support@conseilux.com</p>
+          </div>
+          
+          <div class="contact-method">
+            <div class="contact-icon">📞</div>
+            <h3>Phone</h3>
+            <p>+1 (555) 123-4567</p>
+          </div>
+          
+          <div class="contact-method">
+            <div class="contact-icon">📍</div>
+            <h3>Address</h3>
+            <p>123 Language Street<br>Learning City, LC 12345</p>
+          </div>
+          
+          <div class="contact-method">
+            <div class="contact-icon">⏰</div>
+            <h3>Hours</h3>
+            <p>Monday - Friday: 9am - 6pm<br>Saturday: 10am - 4pm</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form-wrapper">
+        <h2>Send us a Message</h2>
+        <form class="contact-form">
+          <div class="form-group">
+            <label for="contact-name">Name *</label>
+            <input type="text" id="contact-name" class="form-input" required />
+          </div>
+          
+          <div class="form-group">
+            <label for="contact-email">Email *</label>
+            <input type="email" id="contact-email" class="form-input" required />
+          </div>
+          
+          <div class="form-group">
+            <label for="contact-subject">Subject *</label>
+            <input type="text" id="contact-subject" class="form-input" required />
+          </div>
+          
+          <div class="form-group">
+            <label for="contact-message">Message *</label>
+            <textarea id="contact-message" class="form-textarea" rows="6" required></textarea>
+          </div>
+          
+          <button type="submit" class="btn-submit">Send Message</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

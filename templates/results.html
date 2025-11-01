@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="results-page">
+  <div class="results-header">
+    <div class="results-icon">🎉</div>
+    <h1 class="results-title">Congratulations!</h1>
+    <p class="results-subtitle">You have completed the English Proficiency Test</p>
+  </div>
+
+  <div class="results-card">
+    <h2 class="results-card-title">Your Results</h2>
+    
+    <div class="results-grid">
+      <div class="result-item">
+        <div class="result-icon">📖</div>
+        <div class="result-content">
+          <span class="result-label">Reading</span>
+          <span class="result-value">{{ summary.score_reading }} points</span>
+        </div>
+      </div>
+      
+      <div class="result-item">
+        <div class="result-icon">🎧</div>
+        <div class="result-content">
+          <span class="result-label">Listening</span>
+          <span class="result-value">{{ summary.score_listening }} points</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-total">
+      <div class="total-score">
+        <span class="total-label">Total Score</span>
+        <span class="total-value">{{ summary.total_score }} / {{ summary.total_questions }}</span>
+        <div class="score-bar">
+          <div class="score-fill" style="width: {{ (summary.total_score / summary.total_questions * 100)|round }}%"></div>
+        </div>
+      </div>
+      
+      <div class="cefr-level">
+        <span class="level-label">CEFR Level</span>
+        <span class="level-badge">{{ summary.level }}</span>
+      </div>
+    </div>
+
+    {% if summary.total_score >= (summary.total_questions * 0.9)|round %}
+    <div class="certificate-eligible">
+      <div class="eligible-icon">🏆</div>
+      <div class="eligible-content">
+        <h3>Excellent Performance!</h3>
+        <p>You scored {{ (summary.total_score / summary.total_questions * 100)|round }}% - You are eligible for a certificate!</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="results-actions">
+      <form method="post" action="{{ url_for('certificate') }}">
+        <button class="btn-certificate" type="submit">
+          <span class="btn-icon">📜</span>
+          <span>Download Certificate</span>
+        </button>
+      </form>
+      <a class="btn-restart" href="{{ url_for('index') }}">
+        <span class="btn-icon">🔄</span>
+        <span>Take Another Test</span>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

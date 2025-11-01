@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-main">
+  <div class="hero-container">
+    <div class="hero-text">
+      <h1 class="hero-heading">Do you know your English level? Find out for free.</h1>
+      <div class="hero-form">
+        <a href="#test-form" class="btn-get-started">Get started</a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <div class="image-placeholder">
+        <div class="person-studying"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+  <div class="stats-container">
+    <div class="stat-item">
+      <div class="stat-icon">👥</div>
+      <div class="stat-number">20 million</div>
+      <div class="stat-label">students taught</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">📚</div>
+      <div class="stat-number">2 million</div>
+      <div class="stat-label">lessons per year</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">🎓</div>
+      <div class="stat-number">60 years</div>
+      <div class="stat-label">of language education</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-number">★★★★★</div>
+      <div class="stat-label">Average teacher rating</div>
+      <div class="stat-sublabel">(Students rate teachers after each class)</div>
+    </div>
+  </div>
+</section>
+
+<!-- Main Content Section -->
+<section class="main-content">
+  <div class="content-grid">
+    <div class="content-left">
+      <h2 class="content-title">The internationally recognized EF SET test assesses your writing and listening skills.</h2>
+      
+      <div class="feature-list">
+        <div class="feature-item-main">
+          <div class="check-icon">✓</div>
+          <p>Results align with the Common European Framework of Reference for Languages (A1-C2).</p>
+        </div>
+        <div class="feature-item-main">
+          <div class="check-icon">✓</div>
+          <p>You can add your results to your LinkedIn profile or CV.</p>
+        </div>
+        <div class="feature-item-main">
+          <div class="check-icon">✓</div>
+          <p>It only takes 15 minutes.</p>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-icon">ℹ</div>
+        <p><em>Getting an accurate assessment of your English proficiency is crucial to start learning English at the right level. It is also important to know if you are applying for jobs that require a certain level of English.</em></p>
+      </div>
+    </div>
+
+    <div class="content-right">
+      <div class="form-card" id="test-form">
+        <h3 class="form-title">Start your free English test now!</h3>
+        <form method="post" class="test-start-form">
+          <div class="form-group">
+            <input type="text" name="name" placeholder="First Name*" required class="form-input" />
+          </div>
+          <div class="form-group">
+            <input type="text" placeholder="Last Name*" class="form-input" />
+          </div>
+          <div class="form-group">
+            <input type="email" placeholder="Email*" class="form-input" />
+          </div>
+          <div class="form-group">
+            <input type="tel" placeholder="Phone*" class="form-input" />
+          </div>
+          <div class="form-group">
+            <select class="form-input">
+              <option>Age*</option>
+              <option>18-25</option>
+              <option>26-35</option>
+              <option>36-45</option>
+              <option>46+</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <select class="form-input">
+              <option>Motivation*</option>
+              <option>Career advancement</option>
+              <option>Personal development</option>
+              <option>Travel</option>
+              <option>Education</option>
+            </select>
+          </div>
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="privacy" />
+            <label for="privacy">Yes, I have read and understood how EF processes my personal data as established in the privacy policy.*</label>
+          </div>
+          
+          <details class="options-details-small">
+            <summary>Advanced options (timer)</summary>
+            <label class="checkbox">
+              <input type="checkbox" name="timer_enabled" /> Enable timer per section
+            </label>
+            <div class="timer-grid">
+              <div>
+                <label>Reading (min)</label>
+                <input type="number" name="reading_timer" min="1" value="15" class="form-input-small" />
+              </div>
+              <div>
+                <label>Listening (min)</label>
+                <input type="number" name="listening_timer" min="1" value="15" class="form-input-small" />
+              </div>
+            </div>
+          </details>
+
+          <button type="submit" class="btn-submit">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="faq-section">
+  <div class="faq-container">
+    <h2 class="faq-title">Just in case you missed something...</h2>
+    <p class="faq-subtitle">Here are answers to some frequently asked questions about online English test.</p>
+    
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What is the EF SET?</summary>
+        <p>The EF SET is a free, online English test that assesses your reading and listening skills in just 15 minutes.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How does the EF SET English quick test work?</summary>
+        <p>The test adapts to your level and provides accurate results aligned with the CEFR framework.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What are A1, A2, B1, B2, C1 and C2?</summary>
+        <p>These are the six levels of the Common European Framework of Reference for Languages (CEFR).</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is EF SET a good English test?</summary>
+        <p>Yes, it's recognized internationally and used by thousands of organizations worldwide.</p>
+      </details>
+    </div>
+  </div>
+</section>
+{% endblock %}
