@@ -43,16 +43,15 @@
       </div>
     </div>
 
-    {% if summary.total_score >= (summary.total_questions * 0.9)|round %}
+    {% if summary.total_score >= 18 %}
     <div class="certificate-eligible">
       <div class="eligible-icon">🏆</div>
       <div class="eligible-content">
         <h3>Excellent Performance!</h3>
-        <p>You scored {{ (summary.total_score / summary.total_questions * 100)|round }}% - You are eligible for a certificate!</p>
+        <p>You scored {{ summary.total_score }}/{{ summary.total_questions }} - You are eligible for a certificate!</p>
       </div>
     </div>
-    {% endif %}
-
+    
     <div class="results-actions">
       <form method="post" action="{{ url_for('certificate') }}">
         <button class="btn-certificate" type="submit">
@@ -65,6 +64,23 @@
         <span>Take Another Test</span>
       </a>
     </div>
+    {% else %}
+    <div class="certificate-not-eligible">
+      <div class="not-eligible-icon">📚</div>
+      <div class="not-eligible-content">
+        <h3>Keep Practicing!</h3>
+        <p>You scored {{ summary.total_score }}/{{ summary.total_questions }}. You need at least 18/20 to be eligible for a certificate.</p>
+        <p>Don't give up! Take the test again to improve your score.</p>
+      </div>
+    </div>
+    
+    <div class="results-actions">
+      <a class="btn-restart" href="{{ url_for('index') }}">
+        <span class="btn-icon">🔄</span>
+        <span>Try Again</span>
+      </a>
+    </div>
+    {% endif %}
   </div>
 </section>
 {% endblock %}

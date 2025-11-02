@@ -13,6 +13,8 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from reportlab.lib import colors
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 import qrcode
 from io import BytesIO
 
@@ -266,6 +268,14 @@ def create_app():
         pdf_buffer = BytesIO()
         c = canvas.Canvas(pdf_buffer, pagesize=A4)
         width, height = A4
+        
+        # Register standard fonts to avoid KeyError
+        try:
+            from reportlab.pdfbase.pdfmetrics import registerFont
+            from reportlab.pdfbase.ttfonts import TTFont
+            # Standard fonts are built-in, just need to ensure they're available
+        except:
+            pass
 
         # Background - Orange border
         c.setStrokeColor(colors.HexColor('#ff8c42'))
@@ -286,7 +296,7 @@ def create_app():
                 print(f"Logo error: {e}")
 
         # Title
-        c.setFont("Helvetica-Bold", 32)
+        c.setFont("Times-Bold", 32)
         c.setFillColor(colors.HexColor('#ff8c42'))
         c.drawCentredString(width / 2, height - 170, "CERTIFICATE OF ACHIEVEMENT")
         
@@ -301,12 +311,12 @@ def create_app():
         c.line(150, height - 210, width - 150, height - 210)
 
         # "This certifies that"
-        c.setFont("Helvetica-Italic", 14)
+        c.setFont("Times-Italic", 14)
         c.setFillColor(colors.black)
         c.drawCentredString(width / 2, height - 240, "This certifies that")
 
         # Name (large and centered)
-        c.setFont("Helvetica-Bold", 28)
+        c.setFont("Times-Bold", 28)
         c.setFillColor(colors.HexColor('#1e3a8a'))
         c.drawCentredString(width / 2, height - 280, name)
 
@@ -327,12 +337,12 @@ def create_app():
         c.roundRect(100, height - 450, width - 200, 80, 10, stroke=1, fill=1)
 
         # Score and Level
-        c.setFont("Helvetica-Bold", 18)
+        c.setFont("Times-Bold", 18)
         c.setFillColor(colors.HexColor('#1e3a8a'))
         score_text = f"Score: {summary['total_score']} / {summary['total_questions']}"
         c.drawCentredString(width / 2, height - 390, score_text)
         
-        c.setFont("Helvetica-Bold", 22)
+        c.setFont("Times-Bold", 22)
         c.setFillColor(colors.HexColor('#ff8c42'))
         level_text = f"CEFR Level: {summary['level']}"
         c.drawCentredString(width / 2, height - 420, level_text)
@@ -347,7 +357,7 @@ def create_app():
         c.setStrokeColor(colors.black)
         c.setLineWidth(1)
         c.line(width - 250, height - 500, width - 100, height - 500)
-        c.setFont("Helvetica-Italic", 10)
+        c.setFont("Times-Italic", 10)
         c.drawCentredString(width - 175, height - 515, "Authorized Signature")
 
         # Footer text
@@ -371,7 +381,7 @@ def create_app():
         c.drawRightString(width - 50, 50, f"Certificate ID: {verify_code[:8].upper()}")
 
         # Created by
-        c.setFont("Helvetica-Italic", 8)
+        c.setFont("Times-Italic", 8)
         c.setFillColor(colors.HexColor('#ff8c42'))
         c.drawRightString(width - 50, 35, "Created by Daven BANKA")
 
@@ -412,6 +422,8 @@ def create_app():
     return app
 
 
+# For Render deployment
+app = create_app()
+
 if __name__ == "__main__":
-    app = create_app()
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
