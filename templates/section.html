@@ -9,31 +9,14 @@
     {% endif %}
   </div>
 
-  {% if section == 'Reading' and question.text %}
+  {% if question.text %}
     <article class="passage">
-      <h3>Texte</h3>
+      <h3>{{ 'Texte' if section == 'Niveau 1' else ('Exercice de grammaire' if section == 'Niveau 2' else 'Exercice de conjugaison') }}</h3>
       <p class="text-to-speech">{{ question.text }}</p>
     </article>
   {% endif %}
 
   <form method="post" action="{{ url_for('submit_answer', section=section, q_index=q_index) }}" id="question-form">
-    {% if section == 'Listening' %}
-      <div class="audio-container">
-        <div class="audio-controls">
-          <button type="button" class="tts-button" data-tts-text="{{ question.text|default('') }}" aria-label="Écouter l'audio">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-            </svg>
-            <span class="audio-progress">
-              <span class="audio-progress-bar"></span>
-            </span>
-          </button>
-        </div>
-        <p class="audio-instruction">🎧 Click the button above to listen to the audio</p>
-      </div>
-    {% endif %}
 
     <fieldset>
       <legend class="text-to-speech">{{ question.question }}</legend>

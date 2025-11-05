@@ -51,16 +51,32 @@ class TextToSpeech {
   }
 
   speak(text) {
-    if (!text) return;
+    if (!text) {
+      console.warn('Aucun texte à lire');
+      return;
+    }
 
     // Créer une nouvelle instance de SpeechSynthesisUtterance
     this.utterance = new SpeechSynthesisUtterance(text);
     
+    // S'assurer que les voix sont chargées
+    const voices = this.synth.getVoices();
+    if (voices.length === 0) {
+      // Attendre que les voix soient chargées
+      console.log('Chargement des voix...');
+      setTimeout(() => this.speak(text), 100);
+      return;
+    }
+    
     // Configurer les paramètres de la voix
     this.configureVoice(this.utterance);
     
+    console.log('Lecture du texte:', text.substring(0, 50) + '...');
+    console.log('Voix utilisée:', this.utterance.voice?.name || 'Voix par défaut');
+    
     // Gérer les événements
     this.utterance.onstart = () => {
+      console.log('Lecture démarrée');
       this.isPlaying = true;
       this.currentButton.classList.add('playing');
       this.currentButton.classList.add('loading');
@@ -70,7 +86,13 @@ class TextToSpeech {
       this.initAudioVisualization();
     };
 
-    this.utterance.onend = this.utterance.onerror = () => {
+    this.utterance.onend = () => {
+      console.log('Lecture terminée');
+      this.stopSpeech();
+    };
+    
+    this.utterance.onerror = (event) => {
+      console.error('Erreur de lecture:', event.error);
       this.stopSpeech();
     };
 
@@ -99,23 +121,49 @@ class TextToSpeech {
   }
 
   configureVoice(utterance) {
-    // Essayer de trouver une voix française
+    // Essayer de trouver une voix anglaise pour les questions de listening
     const voices = this.synth.getVoices();
-    const frenchVoices = voices.filter(voice => voice.lang.startsWith('fr') || voice.lang.startsWith('fr-'));
     
-    if (frenchVoices.length > 0) {
-      // Préférer les voix natives françaises
-      const preferredVoices = frenchVoices.filter(v => v.localService);
-      utterance.voice = preferredVoices.length > 0 ? preferredVoices[0] : frenchVoices[0];
+    // Détecter si le texte est en anglais (simple heuristique)
+    const text = utterance.text.toLowerCase();
+    const isEnglish = text.includes('the ') || text.includes(' is ') || text.includes(' are ') || 
+                      text.includes('i am ') || text.includes('welcome ') || text.includes('please ');
+    
+    let selectedVoice = null;
+    
+    if (isEnglish) {
+      // Chercher une voix anglaise
+      const englishVoices = voices.filter(voice => 
+        voice.lang.startsWith('en-') || voice.lang === 'en'
+      );
+      
+      if (englishVoices.length > 0) {
+        // Préférer les voix US ou UK
+        const preferredVoices = englishVoices.filter(v => 
+          v.lang === 'en-US' || v.lang === 'en-GB'
+        );
+        selectedVoice = preferredVoices.length > 0 ? preferredVoices[0] : englishVoices[0];
+      }
     } else {
-      // Fallback sur la voix par défaut
-      utterance.voice = voices[0];
+      // Chercher une voix française
+      const frenchVoices = voices.filter(voice => 
+        voice.lang.startsWith('fr') || voice.lang.startsWith('fr-')
+      );
+      
+      if (frenchVoices.length > 0) {
+        const preferredVoices = frenchVoices.filter(v => v.localService);
+        selectedVoice = preferredVoices.length > 0 ? preferredVoices[0] : frenchVoices[0];
+      }
     }
     
+    // Utiliser la voix sélectionnée ou la première disponible
+    utterance.voice = selectedVoice || voices[0];
+    
     // Configurer les paramètres de la voix
-    utterance.rate = 1.0;
+    utterance.rate = 0.9;  // Légèrement plus lent pour une meilleure compréhension
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
+    utterance.lang = isEnglish ? 'en-US' : 'fr-FR';
   }
 
   updateVoices() {

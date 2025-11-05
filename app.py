@@ -61,8 +61,8 @@ def create_app():
 
     def ensure_session():
         session.setdefault("name", "")
-        session.setdefault("settings", {"timer_enabled": False, "reading_timer": 15, "listening_timer": 15})
-        session.setdefault("answers", {"Reading": {}, "Listening": {}})
+        session.setdefault("settings", {"timer_enabled": False, "niveau1_timer": 15, "niveau2_timer": 15, "niveau3_timer": 15})
+        session.setdefault("answers", {"Niveau 1": {}, "Niveau 2": {}, "Niveau 3": {}})
 
     @app.route("/", methods=["GET", "POST"])
     def index():
@@ -70,8 +70,9 @@ def create_app():
         if request.method == "POST":
             name = request.form.get("name", "").strip()
             timer_enabled = request.form.get("timer_enabled") == "on"
-            reading_timer = int(request.form.get("reading_timer", 15))
-            listening_timer = int(request.form.get("listening_timer", 15))
+            niveau1_timer = int(request.form.get("niveau1_timer", 15))
+            niveau2_timer = int(request.form.get("niveau2_timer", 15))
+            niveau3_timer = int(request.form.get("niveau3_timer", 15))
 
             if not name:
                 flash("Veuillez entrer votre nom.", "error")
@@ -80,18 +81,19 @@ def create_app():
             session["name"] = name
             session["settings"] = {
                 "timer_enabled": timer_enabled,
-                "reading_timer": max(1, reading_timer),
-                "listening_timer": max(1, listening_timer),
+                "niveau1_timer": max(1, niveau1_timer),
+                "niveau2_timer": max(1, niveau2_timer),
+                "niveau3_timer": max(1, niveau3_timer),
             }
-            session["answers"] = {"Reading": {}, "Listening": {}}
+            session["answers"] = {"Niveau 1": {}, "Niveau 2": {}, "Niveau 3": {}}
 
             # Build sampled set and randomized order per section + shuffled options (simulating AI selection)
             order: Dict[str, List[int]] = {}
             sampled: Dict[str, List[int]] = {}
-            options_order: Dict[str, Dict[str, List[str]]] = {"Reading": {}, "Listening": {}}
-            seen: Dict[str, List[int]] = session.get("seen", {"Reading": [], "Listening": []})
+            options_order: Dict[str, Dict[str, List[str]]] = {"Niveau 1": {}, "Niveau 2": {}, "Niveau 3": {}}
+            seen: Dict[str, List[int]] = session.get("seen", {"Niveau 1": [], "Niveau 2": [], "Niveau 3": []})
 
-            for sec in ("Reading", "Listening"):
+            for sec in ("Niveau 1", "Niveau 2", "Niveau 3"):
                 qs = questions_by_section(sec)
                 all_indices = list(range(len(qs)))
                 sample_k = min(10, len(all_indices))
@@ -123,13 +125,13 @@ def create_app():
             session["options_order"] = options_order
             session["seen"] = seen
             session["started_at"] = datetime.utcnow().isoformat()
-            return redirect(url_for("section", section="Reading", q=0))
+            return redirect(url_for("section", section="Niveau 1", q=0))
         return render_template("index.html")
 
     @app.route("/section/<section>")
     def section(section: str):
         ensure_session()
-        if section not in ("Reading", "Listening"):
+        if section not in ("Niveau 1", "Niveau 2", "Niveau 3"):
             return redirect(url_for("index"))
 
         q_index = int(request.args.get("q", 0))
@@ -146,8 +148,10 @@ def create_app():
             q_index = 0
         if q_index >= total:
             # Move to next section or results
-            if section == "Reading":
-                return redirect(url_for("section", section="Listening", q=0))
+            if section == "Niveau 1":
+                return redirect(url_for("section", section="Niveau 2", q=0))
+            elif section == "Niveau 2":
+                return redirect(url_for("section", section="Niveau 3", q=0))
             return redirect(url_for("results"))
 
         # Determine absolute question index based on randomized order (fallback to identity)
@@ -169,13 +173,11 @@ def create_app():
         # Timer seconds based on section
         sec_settings = session.get("settings", {})
         timer_enabled = sec_settings.get("timer_enabled", False)
-        timer_seconds = sec_settings.get("reading_timer" if section == "Reading" else "listening_timer", 15) * 60
+        timer_key = "niveau1_timer" if section == "Niveau 1" else ("niveau2_timer" if section == "Niveau 2" else "niveau3_timer")
+        timer_seconds = sec_settings.get(timer_key, 15) * 60
 
-        # Check audio existence for Listening
-        audio_exists = True
-        if section == "Listening" and question.get("audio"):
-            audio_path = STATIC_DIR / "audio" / question.get("audio")
-            audio_exists = audio_path.exists()
+        # No audio for new system
+        audio_exists = False
 
         return render_template(
             "section.html",
@@ -194,7 +196,7 @@ def create_app():
     @app.post("/answer/<section>/<int:q_index>")
     def submit_answer(section: str, q_index: int):
         ensure_session()
-        if section not in ("Reading", "Listening"):
+        if section not in ("Niveau 1", "Niveau 2", "Niveau 3"):
             return redirect(url_for("index"))
 
         choice = request.form.get("choice")
@@ -213,32 +215,40 @@ def create_app():
         return redirect(url_for("section", section=section, q=next_idx))
 
     def compute_score() -> Dict[str, Any]:
-        qs_reading = questions_by_section("Reading")
-        qs_listening = questions_by_section("Listening")
+        qs_niveau1 = questions_by_section("Niveau 1")
+        qs_niveau2 = questions_by_section("Niveau 2")
+        qs_niveau3 = questions_by_section("Niveau 3")
 
-        ans = session.get("answers", {"Reading": {}, "Listening": {}})
+        ans = session.get("answers", {"Niveau 1": {}, "Niveau 2": {}, "Niveau 3": {}})
         sampled = session.get("sampled", {})
-        sampled_reading = sampled.get("Reading", list(range(len(qs_reading))))
-        sampled_listening = sampled.get("Listening", list(range(len(qs_listening))))
+        sampled_niveau1 = sampled.get("Niveau 1", list(range(len(qs_niveau1))))
+        sampled_niveau2 = sampled.get("Niveau 2", list(range(len(qs_niveau2))))
+        sampled_niveau3 = sampled.get("Niveau 3", list(range(len(qs_niveau3))))
 
-        score_reading = 0
-        score_listening = 0
+        score_niveau1 = 0
+        score_niveau2 = 0
+        score_niveau3 = 0
 
-        for i in sampled_reading:
-            q = qs_reading[i]
-            if ans.get("Reading", {}).get(str(i)) == q.get("answer"):
-                score_reading += 1
-        for i in sampled_listening:
-            q = qs_listening[i]
-            if ans.get("Listening", {}).get(str(i)) == q.get("answer"):
-                score_listening += 1
+        for i in sampled_niveau1:
+            q = qs_niveau1[i]
+            if ans.get("Niveau 1", {}).get(str(i)) == q.get("answer"):
+                score_niveau1 += 1
+        for i in sampled_niveau2:
+            q = qs_niveau2[i]
+            if ans.get("Niveau 2", {}).get(str(i)) == q.get("answer"):
+                score_niveau2 += 1
+        for i in sampled_niveau3:
+            q = qs_niveau3[i]
+            if ans.get("Niveau 3", {}).get(str(i)) == q.get("answer"):
+                score_niveau3 += 1
 
-        total_score = score_reading + score_listening
-        total_questions = len(sampled_reading) + len(sampled_listening)
+        total_score = score_niveau1 + score_niveau2 + score_niveau3
+        total_questions = len(sampled_niveau1) + len(sampled_niveau2) + len(sampled_niveau3)
         level = cefr_from_score(total_score)
         return {
-            "score_reading": score_reading,
-            "score_listening": score_listening,
+            "score_niveau1": score_niveau1,
+            "score_niveau2": score_niveau2,
+            "score_niveau3": score_niveau3,
             "total_score": total_score,
             "total_questions": total_questions,
             "level": level,
